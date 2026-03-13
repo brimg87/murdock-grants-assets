@@ -414,28 +414,45 @@ const MurdockWizard = (() => {
   }
 
   // ── Finsweet CMS Filter Integration ──
-  // Sets hidden input values that Finsweet reads to filter CMS collection list items
+  // Sets filter text + hidden input values, then triggers Finsweet recalculation.
+  // Finsweet reads from divs with [fs-cmsfilter-field] inside #fs-filters-wrapper;
+  // hidden inputs with the same IDs exist earlier in DOM so we update both.
   function updateCmsFilters() {
     const sector = sel('sector');
     const subsector = sel('subsector');
     const grantType = sel('grant-type');
 
-    // Finsweet CMS Filter reads from elements with [fs-cmsfilter-field] attributes.
-    // We set hidden inputs that match the filter configuration.
-    const sectorFilter = $('fs-filter-sector');
-    const subsectorFilter = $('fs-filter-subsector');
-    const grantTypeFilter = $('fs-filter-grant-type');
+    // Update the div-based filters (Finsweet reads textContent from these)
+    var wrapper = $('fs-filters-wrapper');
+    if (wrapper) {
+      var divSector = wrapper.querySelector('[fs-cmsfilter-field="sector"]');
+      var divSub = wrapper.querySelector('[fs-cmsfilter-field="subsectors"]');
+      var divGrant = wrapper.querySelector('[fs-cmsfilter-field="grant-types"]');
+      if (divSector) divSector.textContent = sector || '';
+      if (divSub) divSub.textContent = subsector || '';
+      if (divGrant) divGrant.textContent = grantType || '';
+    }
 
-    if (sectorFilter) sectorFilter.value = sector || '';
-    if (subsectorFilter) subsectorFilter.value = subsector || '';
-    if (grantTypeFilter) grantTypeFilter.value = grantType || '';
+    // Also update hidden inputs (belt-and-suspenders)
+    var inputs = document.querySelectorAll('input[type="hidden"][fs-cmsfilter-field]');
+    inputs.forEach(function(inp) {
+      var field = inp.getAttribute('fs-cmsfilter-field');
+      if (field === 'sector') inp.value = sector || '';
+      if (field === 'subsectors') inp.value = subsector || '';
+      if (field === 'grant-types') inp.value = grantType || '';
+      inp.dispatchEvent(new Event('input', { bubbles: true }));
+    });
 
-    // Trigger Finsweet filter recalculation
+    // Trigger Finsweet filter recalculation (try both v1 and v2 APIs)
     if (window.FsAttributes && window.FsAttributes.cmsfilter) {
-      window.FsAttributes.cmsfilter.then((filterInstances) => {
-        filterInstances.forEach(instance => instance.resetFilters());
+      window.FsAttributes.cmsfilter.then(function(filterInstances) {
+        filterInstances.forEach(function(instance) { instance.resetFilters(); });
       });
     }
+    window.FinsweetAttributes = window.FinsweetAttributes || [];
+    window.FinsweetAttributes.push(['list', function(listInstances) {
+      listInstances.forEach(function(instance) { instance.triggerHook('filter'); });
+    }]);
   }
 
   // ── Sticky Summary Bar ──
