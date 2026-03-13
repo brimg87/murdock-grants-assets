@@ -1,0 +1,492 @@
+/* ============================================================
+   Murdock Trust Grant Finder — Webflow CSS Embed
+   Place in: Page Settings > Custom Code > <head>
+
+   Contains styles that can't be achieved in Webflow Designer:
+   - CSS custom properties (design tokens)
+   - Keyframe animations
+   - Backdrop-filter
+   - Print styles
+   - Complex pseudo-elements
+   ============================================================ */
+
+/* ── Design Tokens ── */
+:root {
+  /* Brand: River */
+  --river: #004250;
+  --river-70: #4D7A84;
+  --river-50: #80A0A7;
+  --river-30: #B3C6CB;
+  --river-15: #D9E3E5;
+  /* Brand: Lake */
+  --lake: #50C9B5;
+  --lake-70: #85D9CB;
+  --lake-50: #A9E4DA;
+  --lake-30: #CBEDE8;
+  /* Brand: Gold */
+  --gold: #AC9257;
+  --gold-70: #C4B289;
+  --gold-50: #D5C8AC;
+  --gold-30: #E6DDCD;
+  /* Brand: Salmon */
+  --salmon: #E0684B;
+  --salmon-70: #EA9683;
+  --salmon-50: #EFB3A6;
+  /* Brand: Twilight */
+  --twilight: #005E6E;
+  --twilight-70: #508E99;
+  --twilight-50: #82AEB6;
+  /* Neutral */
+  --gray: #5E5E5F;
+  --gray-70: #8E8E8F;
+  --gray-50: #AEAEAF;
+  --gray-30: #CECECF;
+  --gray-10: #EFEFEF;
+  --white: #FFFFFF;
+  --off-white: #F7F6F3;
+  --cream: #FAF9F6;
+  /* Typography */
+  --font-display: 'Libre Baskerville', Georgia, serif;
+  --font-body: 'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif;
+  /* Easing */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Status */
+  --amber: #D4A017;
+  --amber-bg: rgba(212, 160, 23, .08);
+  --amber-border: rgba(212, 160, 23, .25);
+  --green: #2D8B4E;
+  --green-bg: rgba(45, 139, 78, .06);
+  --green-border: rgba(45, 139, 78, .2);
+}
+
+/* ── Subtle Noise Texture Overlay ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px;
+}
+
+/* ── Keyframe Animations ── */
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(30px, -20px); }
+  66% { transform: translate(-20px, 15px); }
+}
+
+@keyframes stepReveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes chipPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(80, 201, 181, .4); }
+  50% { opacity: .7; box-shadow: 0 0 0 6px rgba(80, 201, 181, 0); }
+}
+
+@keyframes wizardShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+/* ── Wizard Orbs ── */
+.wizard_orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+.wizard_orb--1 {
+  width: 500px; height: 500px;
+  background: rgba(80, 201, 181, .08);
+  top: -10%; left: -5%;
+  animation: orbFloat 20s ease-in-out infinite;
+}
+.wizard_orb--2 {
+  width: 400px; height: 400px;
+  background: rgba(172, 146, 87, .06);
+  bottom: -15%; right: -5%;
+  animation: orbFloat 25s ease-in-out infinite reverse;
+}
+
+/* ── Hide native radio inputs (styled via .wizard_option-card) ── */
+.wizard_option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.wizard_option {
+  cursor: pointer;
+  display: block;
+}
+.wizard_option input[type="radio"]:checked + .wizard_option-card {
+  border-color: var(--lake);
+  box-shadow: 0 0 0 2px var(--lake), 0 4px 20px rgba(80, 201, 181, .2);
+}
+
+/* ── Wizard Step Visibility ── */
+.wizard_step {
+  display: none;
+  animation: stepReveal 450ms var(--ease-out) forwards;
+}
+.wizard_step.is-active {
+  display: block;
+}
+
+/* ── Wizard Disqualify ── */
+.wizard_disqualify {
+  display: none;
+}
+.wizard_disqualify.is-active {
+  display: block;
+}
+
+/* ── Church Sub-Question ── */
+.wizard_sub-question {
+  display: none;
+}
+.wizard_sub-question.is-visible {
+  display: block;
+}
+
+/* ── Wizard Nav (Back button row — hidden on step 1) ── */
+.wizard_nav {
+  display: none;
+}
+
+/* ── Progress Circle States ── */
+.wizard_progress-circle.is-active {
+  color: var(--river);
+  background: var(--lake);
+  border-color: var(--lake);
+  box-shadow: 0 0 0 4px rgba(80, 201, 181, .2), 0 2px 12px rgba(80, 201, 181, .3);
+}
+.wizard_progress-circle.is-complete {
+  color: var(--white);
+  background: rgba(80, 201, 181, .25);
+  border-color: var(--lake-70);
+}
+.wizard_progress-step.is-active .wizard_progress-text {
+  color: var(--white);
+  font-weight: 600;
+}
+
+/* ── Eligibility Banner (Zone A) ── */
+.eligibility-banner {
+  display: none;
+}
+.eligibility-banner.is-visible {
+  display: block;
+}
+
+/* ── Grant Type Detail (Zone B) ── */
+.grant-type-detail {
+  display: none;
+}
+.grant-type-detail.is-visible {
+  display: block;
+}
+
+/* ── Guideline Card Visibility ── */
+.guideline-card {
+  display: none;
+}
+.guideline-card.is-visible {
+  display: block;
+}
+.guideline-card.is-visible:hover {
+  transform: translateY(-4px);
+}
+
+/* ── Dashboard Empty State ── */
+.dashboard_empty {
+  display: none;
+}
+.dashboard_empty.is-visible {
+  display: block;
+}
+
+/* ── Dashboard Controls (hidden until wizard completes) ── */
+.dashboard_controls {
+  display: none;
+}
+
+/* ── Sticky Summary Bar ── */
+.sticky-summary {
+  display: none;
+}
+.sticky-summary.is-visible {
+  display: block;
+}
+
+/* ── View Toggle Active State ── */
+.view-toggle_btn.is-active {
+  color: var(--lake);
+  background: rgba(80, 201, 181, .08);
+}
+
+/* ── Expand All Button ── */
+.btn-expand-all {
+  display: none;
+}
+.btn-expand-all.is-visible {
+  display: inline-flex;
+}
+
+/* ── Backdrop Filter (glass effect on option cards) ── */
+.wizard_option-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Contour Map Backgrounds ── */
+/* Update these URLs after uploading PNGs to Webflow Asset Manager */
+.section-wizard::before {
+  content: '';
+  position: absolute;
+  top: -20%; left: -15%;
+  width: 80%; height: 140%;
+  /* Replace with Webflow asset URL: */
+  background: url('https://uploads-ssl.webflow.com/SITE_ID/ASSET_ID_LEFT_CONTOUR') no-repeat center/contain;
+  opacity: 0.07;
+  pointer-events: none;
+}
+.section-wizard::after {
+  content: '';
+  position: absolute;
+  bottom: -25%; right: -10%;
+  width: 75%; height: 140%;
+  /* Replace with Webflow asset URL: */
+  background: url('https://uploads-ssl.webflow.com/SITE_ID/ASSET_ID_RIGHT_CONTOUR') no-repeat center/contain;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+/* ── Dashboard Dot Grid Background ── */
+.section-dashboard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(0, 66, 80, .04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+/* ── Transition Gradient ── */
+.section-transition::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 10%, var(--gold-50), transparent 90%);
+}
+
+/* ── Chip Pulse Animation ── */
+.dashboard_chip-dot {
+  animation: chipPulse 2.5s ease-in-out infinite;
+}
+
+/* ── Card Sector Accent Colors ── */
+.guideline-card { --card-accent: var(--gray-30); }
+.guideline-card[data-card-sector="all"] { --card-accent: var(--river-30); }
+.guideline-card[data-card-sector="artistic-cultural"] { --card-accent: #8B6BA8; }
+.guideline-card[data-card-sector="civic-engagement"] { --card-accent: var(--gold); }
+.guideline-card[data-card-sector="education-leadership"] { --card-accent: var(--twilight); }
+.guideline-card[data-card-sector="health-environmental"] { --card-accent: #3A7D44; }
+.guideline-card[data-card-sector="scientific-research"] { --card-accent: var(--river); }
+
+.guideline-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--card-accent, var(--gray-30));
+}
+
+/* ── Tag Colors ── */
+.tag--all { color: var(--river-70); background: var(--river-15); }
+.tag--arts { color: #8B6BA8; background: rgba(139, 107, 168, .08); }
+.tag--civic { color: var(--gold); background: rgba(172, 146, 87, .08); }
+.tag--education { color: var(--twilight); background: rgba(0, 94, 110, .06); }
+.tag--health { color: #3A7D44; background: rgba(58, 125, 68, .06); }
+.tag--science { color: var(--river); background: rgba(0, 66, 80, .06); }
+
+/* ── Status Badge Colors ── */
+.status--active { color: var(--green); background: var(--green-bg); }
+.status--paused { color: var(--amber); background: var(--amber-bg); }
+.status--invite-only { color: var(--salmon); background: rgba(224, 104, 75, .08); }
+
+/* ── Paused/Invite Card Treatments ── */
+.guideline-card.is-paused { border-color: var(--amber-border); }
+.guideline-card.is-paused::before { background: var(--amber); }
+.guideline-card.is-invite-only { border-color: rgba(224, 104, 75, .15); }
+.guideline-card.is-invite-only::before { background: var(--salmon); }
+
+/* ── Finsweet Hide Class ── */
+.fs-hide { display: none !important; }
+
+/* ── Grant Type Detail Top Bar ── */
+.grant-type-detail::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--twilight);
+}
+
+/* ── Grant Type Detail Rule Bullets ── */
+.grant-type-detail_rule::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0.55em;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--lake);
+}
+
+/* ── List View Styles ── */
+.guideline-grid.is-list-view { grid-template-columns: 1fr; gap: 0; }
+
+.guideline-grid.is-list-view .guideline-card {
+  border-radius: 0;
+  border-bottom: 1px solid var(--gray-10);
+  border-left: 1px solid rgba(0, 66, 80, .06);
+  border-right: 1px solid rgba(0, 66, 80, .06);
+  border-top: none;
+  padding: 0.875rem 1.25rem;
+}
+.guideline-grid.is-list-view .guideline-card:first-child {
+  border-top: 1px solid rgba(0, 66, 80, .06);
+  border-radius: 12px 12px 0 0;
+}
+.guideline-grid.is-list-view .guideline-card:last-child { border-radius: 0 0 12px 12px; }
+.guideline-grid.is-list-view .guideline-card:first-child:last-child { border-radius: 12px; }
+.guideline-grid.is-list-view .guideline-card::before { display: none; }
+.guideline-grid.is-list-view .guideline-card:hover {
+  transform: none; box-shadow: none; background: var(--off-white);
+}
+.guideline-grid.is-list-view .guideline-card.is-visible:hover { transform: none; }
+
+/* Hide card elements in list view (shown in .list-row instead) */
+.guideline-grid.is-list-view .guideline-card > .guideline-card_top,
+.guideline-grid.is-list-view .guideline-card > .guideline-card_title,
+.guideline-grid.is-list-view .guideline-card_summary,
+.guideline-grid.is-list-view .guideline-card_context { display: none; }
+
+/* List row layout */
+.guideline-grid.is-list-view .guideline-card .list-row {
+  display: flex; align-items: center; gap: 16px; cursor: pointer;
+}
+.guideline-grid.is-list-view .guideline-card .list-row_badges {
+  display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; order: 2;
+}
+.guideline-grid.is-list-view .guideline-card .list-row_title {
+  flex: 1; min-width: 0;
+  font-family: var(--font-display); font-size: 0.9375rem; font-weight: 600;
+  color: var(--twilight);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; order: 1;
+}
+.guideline-grid.is-list-view .guideline-card .list-row_summary {
+  flex-shrink: 1; min-width: 0;
+  font-family: var(--font-body); font-size: 0.8125rem; color: var(--gray-70);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: none; order: 3;
+}
+.guideline-grid.is-list-view .guideline-card .list-chevron {
+  color: var(--gray-30); transition: transform 200ms var(--ease); flex-shrink: 0; order: 4;
+}
+.guideline-grid.is-list-view .guideline-card.is-expanded .list-chevron {
+  transform: rotate(90deg); color: var(--lake);
+}
+.guideline-grid.is-list-view .guideline-card .list-expand {
+  display: none; padding-top: 0.75rem; margin-top: 0.75rem; border-top: 1px solid var(--gray-10);
+}
+.guideline-grid.is-list-view .guideline-card.is-expanded .list-expand { display: block; }
+.guideline-grid.is-list-view .guideline-card .list-expand_summary {
+  font-family: var(--font-body); font-size: 0.875rem; color: var(--gray); line-height: 1.65; margin-bottom: 0.5rem;
+}
+.guideline-grid.is-list-view .guideline-card .list-expand_context {
+  font-family: var(--font-body); font-size: 0.8125rem; color: var(--river-70); line-height: 1.5;
+}
+.guideline-grid.is-list-view .guideline-card .list-expand_context strong {
+  font-weight: 700; color: var(--twilight); font-size: 0.6875rem; letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+@media (min-width: 769px) {
+  .guideline-grid.is-list-view .guideline-card .list-row_summary { display: block; }
+}
+@media (max-width: 768px) {
+  .guideline-grid.is-list-view .guideline-card .list-row { flex-wrap: wrap; padding: 2px 0; }
+  .guideline-grid.is-list-view .guideline-card .list-row_title { white-space: normal; flex-basis: 100%; }
+}
+
+/* ── PRINT STYLES ── */
+@media print {
+  body { background: #fff; color: #222; font-size: 11pt; }
+
+  body::after,
+  .navbar,
+  .section-wizard,
+  .section-transition,
+  .footer,
+  .sticky-summary,
+  .dashboard_controls,
+  .btn-print,
+  .view-toggle,
+  .eligibility-banner_edit,
+  .dashboard_chip,
+  .dashboard_empty,
+  .dashboard_count,
+  .dashboard_count-label { display: none !important; }
+
+  .section-dashboard { padding: 0; }
+  .section-dashboard::before { display: none; }
+
+  .print-header {
+    display: block !important;
+    margin-bottom: 1.5em; padding-bottom: 1em;
+    border-bottom: 2px solid #222;
+  }
+  .print-header_title { font-family: var(--font-display); font-size: 16pt; font-weight: 700; margin-bottom: 0.25em; }
+  .print-header_meta { font-family: var(--font-body); font-size: 9pt; color: #666; }
+
+  .eligibility-banner {
+    border: 1px solid #ccc !important; background: none !important;
+    margin-bottom: 1.5em; padding: 0.75em 1em; break-inside: avoid;
+  }
+  .grant-type-detail {
+    border: 1px solid #ccc; box-shadow: none;
+    break-inside: avoid; break-after: page; margin-bottom: 1.5em;
+  }
+  .grant-type-detail::before { background: #222 !important; }
+
+  .guideline-grid { display: block !important; }
+  .guideline-card {
+    border: none !important; border-bottom: 1px solid #ddd !important;
+    border-radius: 0 !important; box-shadow: none !important;
+    padding: 0.75em 0 !important; break-inside: avoid;
+    opacity: 1 !important; transform: none !important;
+  }
+  .guideline-card::before { display: none !important; }
+  .guideline-card:hover { transform: none !important; box-shadow: none !important; }
+  .guideline-card_title { font-size: 11pt; }
+  .guideline-card_summary { font-size: 10pt; }
+  .guideline-card_context { font-size: 9pt; }
+
+  .guideline-card .list-row,
+  .guideline-card .list-chevron,
+  .guideline-card .list-expand { display: none !important; }
+  .guideline-card_summary,
+  .guideline-card_context { display: block !important; }
+  .dashboard_title { font-size: 14pt; }
+}
+
+.print-header { display: none; }
