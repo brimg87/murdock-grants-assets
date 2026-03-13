@@ -430,7 +430,8 @@ const MurdockWizard = (() => {
       var divGrant = wrapper.querySelector('[fs-cmsfilter-field="grant-types"]');
       if (divSector) divSector.textContent = sector || '';
       if (divSub) divSub.textContent = subsector || '';
-      if (divGrant) divGrant.textContent = grantType || '';
+      // Most CMS cards use "all" for grant-types; leave filter empty to show all matches
+      if (divGrant) divGrant.textContent = '';
     }
 
     // Also update hidden inputs (belt-and-suspenders)
@@ -439,7 +440,7 @@ const MurdockWizard = (() => {
       var field = inp.getAttribute('fs-cmsfilter-field');
       if (field === 'sector') inp.value = sector || '';
       if (field === 'subsectors') inp.value = subsector || '';
-      if (field === 'grant-types') inp.value = grantType || '';
+      if (field === 'grant-types') inp.value = '';
       inp.dispatchEvent(new Event('input', { bubbles: true }));
     });
 
