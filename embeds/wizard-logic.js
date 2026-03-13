@@ -190,6 +190,31 @@ const MurdockWizard = (() => {
       }
     }
 
+    // Step 5: Grant type selection
+    var step5 = $('js-grant-type-options');
+    if (step5 && !step5.children.length) {
+      var grantIcons = {
+        'staff-program': '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" opacity=".5"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>',
+        capital: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14" opacity=".5"/><rect x="9" y="11" width="6" height="10"/><path d="M9 7h1M14 7h1"/></svg>',
+        'equipment-tech': '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2" opacity=".5"/><path d="M8 21h8M12 17v4"/></svg>'
+      };
+      var grantDescs = {
+        'staff-program': 'New positions or program growth',
+        capital: 'Building, renovation, construction',
+        'equipment-tech': 'Hardware, software, instruments'
+      };
+      var html5 = '';
+      Object.keys(GRANT_LABELS).forEach(function(k) {
+        html5 += '<label class="wizard_option" data-grant-type="' + k + '"><input type="radio" name="grant-type" value="' + k + '">'
+          + '<span class="wizard_option-card">'
+          + '<span class="wizard_option-icon">' + grantIcons[k] + '</span>'
+          + '<span class="wizard_option-text">' + GRANT_LABELS[k] + '</span>'
+          + '<span class="wizard_option-sub">' + grantDescs[k] + '</span>'
+          + '</span></label>';
+      });
+      step5.innerHTML = html5;
+    }
+
     // Add back-button navs to steps 3-5 (injected as needed)
     [3, 4, 5].forEach(function(n) {
       var stepEl = document.querySelector('[data-step="' + n + '"]');
