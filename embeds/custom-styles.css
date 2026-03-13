@@ -150,10 +150,12 @@ body::after {
 }
 
 /* ── Church Sub-Question ── */
-.wizard_sub-question {
+.wizard_sub-question,
+#js-church-question {
   display: none;
 }
-.wizard_sub-question.is-visible {
+.wizard_sub-question.is-visible,
+#js-church-question.is-visible {
   display: block;
 }
 
