@@ -236,15 +236,19 @@ const MurdockWizard = (() => {
       if (n === 5) {
         var existingCta = stepEl.querySelector('.btn-primary');
         if (existingCta) {
-          // Attach handler to existing Webflow button
+          // Attach handler and hide until a grant type is selected
           existingCta.href = 'javascript:void(0)';
           existingCta.onclick = function(e) { e.preventDefault(); MurdockWizard.complete(); };
+          existingCta.style.display = 'none';
+          existingCta.setAttribute('data-cta-step5', '');
         } else {
           var cta = document.createElement('button');
           cta.type = 'button';
           cta.className = 'btn-primary is-cta';
           cta.onclick = function() { MurdockWizard.complete(); };
           cta.innerHTML = 'View My Guidelines &rarr;';
+          cta.style.display = 'none';
+          cta.setAttribute('data-cta-step5', '');
           nav.appendChild(cta);
         }
       }
@@ -279,7 +283,12 @@ const MurdockWizard = (() => {
     lines.forEach(l => l.classList.toggle('is-filled', parseInt(l.dataset.line) < step));
 
     if (step === 4) populateSubsectors();
-    if (step === 5) updateGrantTypeStates();
+    if (step === 5) {
+      updateGrantTypeStates();
+      // Show CTA only if a grant type is already selected
+      var cta = document.querySelector('[data-cta-step5]');
+      if (cta) cta.style.display = sel('grant-type') ? '' : 'none';
+    }
     churchQ.classList.remove('is-visible');
     orgNav.style.display = '';
   }
@@ -633,6 +642,12 @@ const MurdockWizard = (() => {
     var step = e.target.closest('.wizard_step');
     if (!step) return;
     var stepNum = parseInt(step.dataset.step);
+    if (stepNum === 5) {
+      // Show the CTA button when a grant type is selected
+      var cta = document.querySelector('[data-cta-step5]');
+      if (cta) cta.style.display = '';
+      return;
+    }
     if (stepNum >= 5) return;
     setTimeout(function () { MurdockWizard.next(stepNum); }, 300);
   });
