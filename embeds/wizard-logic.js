@@ -413,47 +413,38 @@ const MurdockWizard = (() => {
     }
   }
 
-  // ── Finsweet CMS Filter Integration ──
-  // Sets filter text + hidden input values, then triggers Finsweet recalculation.
-  // Finsweet reads from divs with [fs-cmsfilter-field] inside #fs-filters-wrapper;
-  // hidden inputs with the same IDs exist earlier in DOM so we update both.
+  // ── Card Filtering (direct DOM filtering — replaces Finsweet dependency) ──
+  // Each CMS card has child divs with fs-cmsfilter-field="sector|subsectors|grant-types".
+  // We show/hide cards based on whether their field values match the wizard selections.
   function updateCmsFilters() {
     const sector = sel('sector');
     const subsector = sel('subsector');
-    const grantType = sel('grant-type');
 
-    // Update the div-based filters (Finsweet reads textContent from these)
-    var wrapper = $('fs-filters-wrapper');
-    if (wrapper) {
-      var divSector = wrapper.querySelector('[fs-cmsfilter-field="sector"]');
-      var divSub = wrapper.querySelector('[fs-cmsfilter-field="subsectors"]');
-      var divGrant = wrapper.querySelector('[fs-cmsfilter-field="grant-types"]');
-      if (divSector) divSector.textContent = sector || '';
-      if (divSub) divSub.textContent = subsector || '';
-      // Most CMS cards use "all" for grant-types; leave filter empty to show all matches
-      if (divGrant) divGrant.textContent = '';
-    }
+    if (!guideGrid) return;
+    const cards = guideGrid.querySelectorAll('.guideline-card');
+    let count = 0;
 
-    // Also update hidden inputs (belt-and-suspenders)
-    var inputs = document.querySelectorAll('input[type="hidden"][fs-cmsfilter-field]');
-    inputs.forEach(function(inp) {
-      var field = inp.getAttribute('fs-cmsfilter-field');
-      if (field === 'sector') inp.value = sector || '';
-      if (field === 'subsectors') inp.value = subsector || '';
-      if (field === 'grant-types') inp.value = '';
-      inp.dispatchEvent(new Event('input', { bubbles: true }));
+    cards.forEach(function(card) {
+      const cardSector = (card.querySelector('[fs-cmsfilter-field="sector"]') || {}).textContent || '';
+      const cardSubs = (card.querySelector('[fs-cmsfilter-field="subsectors"]') || {}).textContent || '';
+
+      // Card matches if:
+      // - sector matches OR card sector is "all"
+      // - AND subsector matches OR card subsector is "all"
+      const sectorMatch = !sector || cardSector === sector || cardSector === 'all';
+      const subMatch = !subsector || cardSubs === subsector || cardSubs === 'all';
+      const show = sectorMatch && subMatch;
+
+      card.style.display = show ? '' : 'none';
+      if (show) count++;
     });
 
-    // Trigger Finsweet filter recalculation (try both v1 and v2 APIs)
-    if (window.FsAttributes && window.FsAttributes.cmsfilter) {
-      window.FsAttributes.cmsfilter.then(function(filterInstances) {
-        filterInstances.forEach(function(instance) { instance.resetFilters(); });
-      });
-    }
-    window.FinsweetAttributes = window.FinsweetAttributes || [];
-    window.FinsweetAttributes.push(['list', function(listInstances) {
-      listInstances.forEach(function(instance) { instance.triggerHook('filter'); });
-    }]);
+    // Update result count
+    var countEl = $('js-result-count');
+    if (countEl) countEl.textContent = count;
+
+    // Show/hide empty state
+    if (emptyState) emptyState.classList.toggle('is-visible', count === 0);
   }
 
   // ── Sticky Summary Bar ──
