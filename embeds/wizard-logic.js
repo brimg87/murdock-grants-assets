@@ -435,7 +435,7 @@ const MurdockWizard = (() => {
       const subMatch = !subsector || cardSubs === subsector || cardSubs === 'all';
       const show = sectorMatch && subMatch;
 
-      card.style.display = show ? '' : 'none';
+      card.classList.toggle('is-visible', show);
       if (show) count++;
     });
 
@@ -627,12 +627,9 @@ const MurdockWizard = (() => {
       updateCmsFilters();
       renderStickyBar();
       controls.style.display = '';
-      // Wait for Finsweet to filter, then add list structure and reveal
-      setTimeout(() => {
-        addListStructure();
-        applyView(currentView);
-        revealCards();
-      }, 300);
+      // Add list structure and apply view
+      addListStructure();
+      applyView(currentView);
       setTimeout(scrollToDashboard, 400);
     },
     reset() {
