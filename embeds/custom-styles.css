@@ -159,9 +159,15 @@ body::after {
   display: block;
 }
 
-/* ── Wizard Nav (Back button row — hidden on step 1) ── */
+/* ── Wizard Nav (Back button row — hidden on step 1, visible on active steps 2+) ── */
 .wizard_nav {
   display: none;
+}
+.wizard_step.is-active .wizard_nav {
+  display: flex;
+  gap: 12px;
+  margin-top: 1.5rem;
+  justify-content: center;
 }
 
 /* ── Progress Circle States ── */
