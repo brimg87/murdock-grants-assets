@@ -99,23 +99,12 @@ const MurdockWizard = (() => {
   const ORG_LABELS = { '501c3': '501(c)(3) Nonprofit', tribal: 'Tribal Entity', government: 'Government Entity', church: 'Church / Faith-Based' };
   const GRANT_LABELS = { 'staff-program': 'Staff/Program Expansion', capital: 'Capital Project', 'equipment-tech': 'Equipment & Technology' };
 
-  // ── DOM References ──
+  // ── DOM References (assigned in _initDOM after DOM is ready) ──
   const $ = (id) => document.getElementById(id);
-  const banner = $('js-banner');
-  const grantDetail = $('js-grant-detail');
-  const guideGrid = $('js-guideline-grid');
-  const emptyState = $('js-empty-state');
-  const allSteps = document.querySelectorAll('.wizard_step');
-  const circles = document.querySelectorAll('.wizard_progress-circle');
-  const progSteps = document.querySelectorAll('.wizard_progress-step');
-  const lines = document.querySelectorAll('.wizard_progress-line-fill');
-  const disqualifyEl = $('js-disqualify');
-  const churchQ = $('js-church-question');
-  const orgNav = $('js-org-nav');
-  const stickyBar = $('js-sticky-summary');
-  const stickyTags = $('js-sticky-tags');
-  const controls = $('js-controls');
-  const expandBtn = $('js-expand-all');
+  let banner, grantDetail, guideGrid, emptyState;
+  let allSteps, circles, progSteps, lines;
+  let disqualifyEl, churchQ, orgNav;
+  let stickyBar, stickyTags, controls, expandBtn;
 
   let currentStep = 1;
   let isDisqualified = false;
@@ -522,11 +511,31 @@ const MurdockWizard = (() => {
     cards.forEach((c, i) => setTimeout(() => c.classList.add('is-visible'), 50 * i));
   }
 
-  // ── Initialize: render options and show step 1 on load ──
-  renderStaticSteps();
-  goToStep(1);
-  controls.style.display = 'none';
+  // ── Initialize: assign DOM refs, render options, show step 1 ──
+  function _initDOM() {
+    banner = $('js-banner');
+    grantDetail = $('js-grant-detail');
+    guideGrid = $('js-guideline-grid');
+    emptyState = $('js-empty-state');
+    allSteps = document.querySelectorAll('.wizard_step');
+    circles = document.querySelectorAll('.wizard_progress-circle');
+    progSteps = document.querySelectorAll('.wizard_progress-step');
+    lines = document.querySelectorAll('.wizard_progress-line-fill');
+    disqualifyEl = $('js-disqualify');
+    churchQ = $('js-church-question');
+    orgNav = $('js-org-nav');
+    stickyBar = $('js-sticky-summary');
+    stickyTags = $('js-sticky-tags');
+    controls = $('js-controls');
+    expandBtn = $('js-expand-all');
 
+    renderStaticSteps();
+    goToStep(1);
+    controls.style.display = 'none';
+    _bindListeners();
+  }
+
+  function _bindListeners() {
   // ── Org Type Radio Listener (delegated — radios created dynamically) ──
   document.getElementById('eligibility-wizard').addEventListener('change', function (e) {
     if (e.target.type !== 'radio') return;
@@ -553,6 +562,14 @@ const MurdockWizard = (() => {
     if (stepNum >= 5) return;
     setTimeout(function () { MurdockWizard.next(stepNum); }, 300);
   });
+  } // end _bindListeners
+
+  // Run init when DOM is ready (supports external script loading via CDN)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _initDOM);
+  } else {
+    _initDOM();
+  }
 
   // ── Public API ──
   return {
