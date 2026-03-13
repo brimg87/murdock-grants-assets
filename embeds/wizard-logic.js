@@ -574,6 +574,39 @@ const MurdockWizard = (() => {
     goToStep(1);
     controls.style.display = 'none';
     _bindListeners();
+    _wireWebflowButtons();
+  }
+
+  // ── Attach handlers to static Webflow <a> buttons ──
+  function _wireWebflowButtons() {
+    // "Start Over" button in empty state
+    var startOver = emptyState && emptyState.querySelector('.btn-primary');
+    if (startOver) {
+      startOver.href = 'javascript:void(0)';
+      startOver.onclick = function(e) { e.preventDefault(); MurdockWizard.reset(); };
+    }
+
+    // "← Go Back" button in disqualify section
+    var goBack = disqualifyEl && disqualifyEl.querySelector('.btn-secondary');
+    if (goBack) {
+      goBack.href = 'javascript:void(0)';
+      goBack.onclick = function(e) { e.preventDefault(); MurdockWizard.backFromDisqualify(); };
+    }
+
+    // "Edit Selections" in sticky summary bar
+    var editSel = stickyBar && stickyBar.querySelector('.sticky-summary_edit');
+    if (editSel) {
+      editSel.href = 'javascript:void(0)';
+      editSel.onclick = function(e) { e.preventDefault(); MurdockWizard.reset(); };
+    }
+
+    // "Edit Selections" in eligibility banner (dynamically created, so wire via delegation)
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('eligibility-banner_edit')) {
+        e.preventDefault();
+        MurdockWizard.reset();
+      }
+    });
   }
 
   function _bindListeners() {
@@ -642,11 +675,13 @@ const MurdockWizard = (() => {
       }
       document.querySelectorAll('[data-grant-detail]').forEach(el => { el.style.display = 'none'; });
       guideGrid.classList.remove('is-list-view');
+      // Hide all cards and reset count
+      guideGrid.querySelectorAll('.guideline-card').forEach(function(c) { c.classList.remove('is-visible'); });
+      var countEl = $('js-result-count');
+      if (countEl) countEl.textContent = '—';
       if (emptyState) emptyState.classList.remove('is-visible');
       hideStickyBar();
       controls.style.display = 'none';
-      // Reset Finsweet filters
-      updateCmsFilters();
       goToStep(1);
       $('wizard-section').scrollIntoView({ behavior: 'smooth' });
     },
