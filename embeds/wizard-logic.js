@@ -233,13 +233,20 @@ const MurdockWizard = (() => {
         back.innerHTML = '&larr; Back';
         nav.insertBefore(back, nav.firstChild);
       }
-      if (n === 5 && !stepEl.querySelector('.btn-primary')) {
-        var cta = document.createElement('button');
-        cta.type = 'button';
-        cta.className = 'btn-primary is-cta';
-        cta.onclick = function() { MurdockWizard.complete(); };
-        cta.innerHTML = 'View My Guidelines &rarr;';
-        nav.appendChild(cta);
+      if (n === 5) {
+        var existingCta = stepEl.querySelector('.btn-primary');
+        if (existingCta) {
+          // Attach handler to existing Webflow button
+          existingCta.href = 'javascript:void(0)';
+          existingCta.onclick = function(e) { e.preventDefault(); MurdockWizard.complete(); };
+        } else {
+          var cta = document.createElement('button');
+          cta.type = 'button';
+          cta.className = 'btn-primary is-cta';
+          cta.onclick = function() { MurdockWizard.complete(); };
+          cta.innerHTML = 'View My Guidelines &rarr;';
+          nav.appendChild(cta);
+        }
       }
     });
   }
